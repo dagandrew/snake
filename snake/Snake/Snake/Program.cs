@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Snake
@@ -10,29 +11,44 @@ namespace Snake
     {
         static void Main(string[] args)
         {
-            Point p1 = new Point();
-            p1.x = 1;
-            p1.y = 2;
-            p1.sym = '*';
-            p1.Draw();
-            Point p2 = new Point();
-            p2.x = 4;
-            p2.y = 5;
-            p2.sym = '#';
-            p2.Draw();
-            /*int x1 = 1;
-            int y1 = 3;
-            char sym1 = '*';
-            Draw(x1, y1, sym1);
-            int x2 = 2;
-            int y2 = 2;
-            char sym2 = '#';
-            Draw(x2, y2, sym2);*/
-            Console.ReadLine();
-        }
-        static void Draw(int x, int y, char sym)
-        {
-            
+            Console.SetWindowSize(1, 1);
+            Console.SetBufferSize(82, 26);
+            Console.SetWindowSize(82, 26);
+
+            Wall walls = new Wall(82, 26);
+            walls.Draw();
+
+            Point p = new Point(4, 4, '*');
+            Snake snake = new Snake(p, 4, Direction.DOWN);
+            snake._Draw();
+
+            FoodCreator foodCreator = new FoodCreator(80, 25, '*');
+            Point food = foodCreator.CreateFood();
+            food.Draw();
+
+            while (true)
+            {
+                if(walls.IsHit(snake) || snake.IsHitTali())
+                {
+                    break;
+                }
+                if (snake.Eat(food))
+                {
+                    food = foodCreator.CreateFood();
+                    food.Draw();
+                }
+                else
+                {
+                    snake.Move();
+                }
+                Thread.Sleep(100);
+                if (Console.KeyAvailable)
+                {
+                    ConsoleKeyInfo key = Console.ReadKey();
+                    snake.HandleKey(key.Key);
+                }
+                
+            }
         }
     }
 }
